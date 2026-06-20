@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "112577515365",
+    "project_id": "benevoles-app",
+    "storage_bucket": "benevoles-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112577515365:android:1d9cf1659fe89623555b8c",
+        "android_client_info": {
+          "package_name": "com.example.projet_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb2hiv4ddBkM7PIMxpzXmuCy7u2dvcLWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

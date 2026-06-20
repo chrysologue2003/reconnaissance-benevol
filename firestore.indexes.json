@@ -1,0 +1,54 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "actions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "statut", "order": "ASCENDING" },
+        { "fieldPath": "datePublication", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "actions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "categorie", "order": "ASCENDING" },
+        { "fieldPath": "statut", "order": "ASCENDING" },
+        { "fieldPath": "datePublication", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "actions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "datePublication", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "actions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "statut", "order": "ASCENDING" },
+        { "fieldPath": "datePublication", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "actions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "statut", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

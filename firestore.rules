@@ -1,0 +1,111 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------
+    // HELPER : vérifie si l'utilisateur connecté est admin
+    // en lisant son document dans /users/{uid}
+    // -------------------------------------------------------
+    function isAdmin() {
+      return request.auth != null &&
+        (
+          // Via le champ 'role' dans le document utilisateur
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          ||
+          // Fallback : email historique pour rétrocompatibilité
+          request.auth.token.email == 'admin@benevoles.com'
+        );
+    }
+
+    // -------------------------------------------------------
+    // COLLECTION : users
+    // -------------------------------------------------------
+    match /users/{userId} {
+      // Tout utilisateur connecté peut lire les profils (classement, avatars, etc.)
+      allow read: if request.auth != null;
+
+      // Création uniquement pour son propre compte
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Mise à jour :
+      //   - par soi-même (profil)
+      //   - par un admin (gestion des rôles)
+      //   - par n'importe quel utilisateur connecté pour les champs points/badges
+      //     (nécessaire pour toggleLike et validateAction)
+      allow update: if request.auth != null && (
+        request.auth.uid == userId ||
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points', 'badges'])
+      );
+
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------
+    // COLLECTION : actions
+    // -------------------------------------------------------
+    match /actions/{actionId} {
+      // Lecture des actions validées : tout utilisateur connecté
+      // Lecture des actions "en attente" ou "rejetées" : admin uniquement
+      allow read: if request.auth != null && (
+        resource.data.statut == 'validé' ||
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Création d'une action : tout utilisateur connecté
+      allow create: if request.auth != null;
+
+      // Mise à jour :
+      //   - par l'auteur de l'action (modification avant validation)
+      //   - par un admin (validation / rejet → champs statut + commentaireAdmin)
+      //   - par n'importe quel utilisateur connecté pour les likes uniquement
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.userId ||
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+      );
+
+      allow delete: if isAdmin();
+
+      // Sous-collection commentaires
+      match /comments/{commentId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null;
+        allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+        allow delete: if request.auth != null && (
+          resource.data.userId == request.auth.uid || isAdmin()
+        );
+      }
+    }
+
+    // -------------------------------------------------------
+    // COLLECTION : badges
+    // -------------------------------------------------------
+    match /badges/{badgeId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------
+    // COLLECTION : notifications (personnelles)
+    // -------------------------------------------------------
+    match /notifications/{notifId} {
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------
+    // COLLECTION : global_notifications
+    // -------------------------------------------------------
+    match /global_notifications/{notifId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow delete: if false;
+    }
+  }
+}
